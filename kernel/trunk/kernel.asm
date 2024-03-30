@@ -91,7 +91,7 @@ pci_data_sel   =  pci_data_32-gdts
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; That is a loading and initialization code that also draws the blue screen
-; menu with svn revision number near top right corner of the screen.
+; menu with version in the upper left corner of the screen.
 include "bootbios.inc"
 
 use32
@@ -712,10 +712,10 @@ end if
 
 
 ;-----------------------------------------------------------------------------
-; show SVN version of kernel on the message board
+; show Git-hash of kernel on the message board
 ;-----------------------------------------------------------------------------
-        mov     eax, [version_inf.rev]
-        DEBUGF  1, "K : kernel SVN r%d\n", eax
+        mov     eax, version_inf.hash
+        DEBUGF  1, "K : kernel GIT %s\n", eax
 ;-----------------------------------------------------------------------------
 ; show CPU count on the message board
 ;-----------------------------------------------------------------------------
@@ -2400,9 +2400,7 @@ endg
 
 iglobal
 version_inf:
-        db 0,7,7,0  ; version 0.7.7.0
-        db 0
-.rev    dd __REV__
+include 'ver.inc'
 .size = $ - version_inf
 endg
 ;------------------------------------------------------------------------------
@@ -4575,8 +4573,6 @@ diff16 "end of .text segment",0,$
 end if
 
 include "data32.inc"
-
-__REV__ = __REV
 
 if ~ lang eq sp
 diff16 "end of kernel code",0,$
