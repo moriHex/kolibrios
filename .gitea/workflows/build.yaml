@@ -43,9 +43,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: /home/autobuild
-          key: ${{ runner.os }}-kolibri-toolchain-${{ gitea.sha }}
-          restore-keys: |
-            ${{ runner.os }}-kolibri-toolchain-
+          key: kolibri-toolchain
 
       - name: Install toolchain
         if: steps.cache-toolchain.outputs.cache-hit != 'true'
@@ -119,7 +117,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: /home/autobuild
-          key: ${{ runner.os }}-kolibri-toolchain--${{ gitea.sha }}
+          key: kolibri-toolchain
 
       - name: Configure tup
         run: |
@@ -186,7 +184,6 @@ jobs:
         with:
           path: /home/autobuild
           key: kolibri-toolchain
-          restore-keys: kolibri-
 
       - name: Install toolchain
         if: steps.cache-toolchain.outputs.cache-hit != 'true'
@@ -259,7 +256,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: /root/autobuild
-          key: ${{ runner.os }}-kolibri-toolchain-${{ gitea.sha }}
+          key: kolibri-toolchain
 
       - name: Config tup
         run: |
