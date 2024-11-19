@@ -111,6 +111,7 @@ jobs:
           mv /root/autobuild /home/autobuild
           ls -l /home/autobuild
           ls -l ${{ gitea.workspace }}
+        if: steps.cache-toolchain.outputs.cache-hit != 'true'
 
       - name: Save toolchain
         if: steps.cache-toolchain.outputs.cache-hit != 'true'
@@ -148,22 +149,26 @@ jobs:
           export PATH=/home/autobuild/tools/win32/bin:$PATH
           sh build.sh
 
+      - name: Get describe
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
       - name: Upload floppy image
         uses: actions/upload-artifact@v3
         with:
-          name: kolibrios-eng-img-${{ gitea.sha }}
+          name: kolibrios-eng-${{ steps.vars.outputs.sha_short }}.img
           path: data/kolibri.img
 
       - name: Upload CD image
         uses: actions/upload-artifact@v3
         with:
-          name: kolibrios-eng-iso-${{ gitea.sha }}
+          name: kolibrios-eng-${{ steps.vars.outputs.sha_short }}.iso
           path: data/kolibri.iso
 
       - name: Upload raw image
         uses: actions/upload-artifact@v3
         with:
-          name: kolibrios-eng-raw-${{ gitea.sha }}
+          name: kolibrios-eng-${{ steps.vars.outputs.sha_short }}.raw
           path: data/kolibri.raw
 
   build-ru-system:
@@ -176,7 +181,7 @@ jobs:
 
       - name: Setup dependencies
         run: |
-          sudo apt update && sudo apt install p7zip-full nasm make gcc sudo mtools mkisofs parted gdisk gcc-multilib tree -y
+          sudo apt update && sudo apt install p7zip-full nasm make gcc sudo mtools mkisofs parted gdisk gcc-multilib git ccache libfuse3-dev build-essential flex bison gperf libncurses5-dev libncursesw5-dev gawk libmpfr-dev libgpm-dev zlib1g-dev yasm graphviz -y
 
       - name: Restore toolchain
         id: cache-toolchain
@@ -239,7 +244,6 @@ jobs:
       - name: Build tup
         if: steps.cache-toolchain.outputs.cache-hit != 'true'
         run: |
-          sudo apt install git ccache libfuse3-dev build-essential flex bison gperf libncurses5-dev libncursesw5-dev gawk libmpfr-dev libgpm-dev zlib1g-dev yasm graphviz -y
           git clone https://github.com/gittup/tup /home/autobuild/tup
           cd /home/autobuild/tup
           sh bootstrap-nofuse.sh
@@ -248,19 +252,21 @@ jobs:
           cd ${{ gitea.workspace }}
 
       - run: |
-          ls -l /root/autobuild
+          rm /home/autobuild
+          mv /root/autobuild /home/autobuild
+          ls -l /home/autobuild
           ls -l ${{ gitea.workspace }}
+        if: steps.cache-toolchain.outputs.cache-hit != 'true'
 
       - name: Save toolchain
         if: steps.cache-toolchain.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
-          path: /root/autobuild
+          path: /home/autobuild
           key: kolibri-toolchain
 
-      - name: Config tup
+      - name: Configure tup
         run: |
-          export PATH=/home/autobuild/tools/win32/bin:$PATH
           source ~/.bashrc
           export ROOT=${{ gitea.workspace }}
           cd $ROOT
@@ -276,6 +282,11 @@ jobs:
           echo "CONFIG_NO_MSVC=full"                                                      >> tup.config
           echo "CONFIG_INSERT_REVISION_ID=1"                                              >> tup.config
 
+          rm $ROOT/programs/develop/libraries/kos_mbedtls/library/Tupfile.lua
+          rm $ROOT/programs/develop/libraries/kos_mbedtls/programs/ssl/Tupfile.lua
+
+          cat tup.config
+          /home/autobuild/tup/tup init
           /home/autobuild/tup/tup generate build.sh
 
       - name: Build
@@ -283,20 +294,24 @@ jobs:
           export PATH=/home/autobuild/tools/win32/bin:$PATH
           sh build.sh
 
+      - name: Get describe
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
       - name: Upload floppy image
         uses: actions/upload-artifact@v3
         with:
-          name: kolibrios-rus-img-${{ gitea.sha }}
+          name: kolibrios-rus-${{ steps.vars.outputs.sha_short }}.img
           path: data/kolibri.img
 
       - name: Upload CD image
         uses: actions/upload-artifact@v3
         with:
-          name: kolibrios-rus-iso-${{ gitea.sha }}
+          name: kolibrios-rus-${{ steps.vars.outputs.sha_short }}.iso
           path: data/kolibri.iso
 
       - name: Upload raw image
         uses: actions/upload-artifact@v3
         with:
-          name: kolibrios-rus-raw-${{ gitea.sha }}
+          name: kolibrios-rus-${{ steps.vars.outputs.sha_short }}.raw
           path: data/kolibri.raw
