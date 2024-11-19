@@ -36,7 +36,7 @@ jobs:
 
       - name: Setup dependencies
         run: |
-          sudo apt update && sudo apt install p7zip-full nasm make gcc sudo mtools mkisofs parted gdisk gcc-multilib tree -y
+          sudo apt update && sudo apt install p7zip-full nasm make gcc sudo mtools mkisofs parted gdisk gcc-multilib git ccache libfuse3-dev build-essential flex bison gperf libncurses5-dev libncursesw5-dev gawk libmpfr-dev libgpm-dev zlib1g-dev yasm graphviz -y
 
       - name: Restore toolchain
         id: cache-toolchain
@@ -101,7 +101,6 @@ jobs:
       - name: Build tup
         if: steps.cache-toolchain.outputs.cache-hit != 'true'
         run: |
-          sudo apt install git ccache libfuse3-dev build-essential flex bison gperf libncurses5-dev libncursesw5-dev gawk libmpfr-dev libgpm-dev zlib1g-dev yasm graphviz -y
           git clone https://github.com/gittup/tup /home/autobuild/tup
           cd /home/autobuild/tup
           sh bootstrap-nofuse.sh
@@ -118,7 +117,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: /root/autobuild
-          key: ${{ runner.os }}-kolibri-toolchain-${{ gitea.sha }}
+          key: ${{ runner.os }}-kolibri-toolchain--${{ gitea.sha }}
 
       - name: Configure tup
         run: |
