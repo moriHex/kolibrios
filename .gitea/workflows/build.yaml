@@ -142,7 +142,7 @@ jobs:
           /home/autobuild/tup/tup init
           /home/autobuild/tup/tup generate build.sh
 
-      - name: build
+      - name: Build
         run: |
           export PATH=/home/autobuild/tools/win32/bin:$PATH
           sh build.sh
@@ -276,6 +276,11 @@ jobs:
           echo "CONFIG_INSERT_REVISION_ID=1"                                              >> tup.config
 
           /home/autobuild/tup/tup generate build.sh
+
+      - name: Build
+        run: |
+          export PATH=/home/autobuild/tools/win32/bin:$PATH
+          sh build.sh
 
       - name: Upload floppy image
         uses: actions/upload-artifact@v3
