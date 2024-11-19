@@ -109,14 +109,16 @@ jobs:
           cd ${{ gitea.workspace }}
 
       - run: |
-          ls -l /root/autobuild
+          rm /home/autobuild
+          mv /root/autobuild /home/autobuild
+          ls -l /home/autobuild
           ls -l ${{ gitea.workspace }}
 
       - name: Save toolchain
         if: steps.cache-toolchain.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
-          path: /root/autobuild
+          path: /home/autobuild
           key: ${{ runner.os }}-kolibri-toolchain--${{ gitea.sha }}
 
       - name: Configure tup
