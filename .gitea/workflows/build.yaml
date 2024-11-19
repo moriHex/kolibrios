@@ -9,8 +9,25 @@ on:
       - '**'
 
 jobs:
+  codestyle:
+    name: "Check codestyle"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup dependencies
+        run: |
+          sudo apt update && sudo apt install perl -y
+
+      - name: Check codestyle
+        run: |
+          wget https://gist.githubusercontent.com/VerySweetBread/d207dd2c7efbd3cdd18dc8322b194816/raw/bf21c89d7eb1df71e253dc72bcde86ea854df19f/checker.pl
+          find kernel/trunk -iname '*.asm' -or -iname '*.inc' -exec bash -c "echo {}; cat {} | perl checker.pl" \;
+
   build-en-system:
-    name: 'Build system'
+    name: 'Build en_US system'
 
     runs-on: ubuntu-latest
 
@@ -20,12 +37,7 @@ jobs:
 
       - name: Setup dependencies
         run: |
-          sudo apt update && sudo apt install perl p7zip-full nasm make gcc sudo mtools mkisofs parted gdisk gcc-multilib tree -y
-
-      - name: Check codestyle
-        run: |
-          wget https://gist.githubusercontent.com/VerySweetBread/d207dd2c7efbd3cdd18dc8322b194816/raw/bf21c89d7eb1df71e253dc72bcde86ea854df19f/checker.pl
-          find kernel/trunk -iname '*.asm' -or -iname '*.inc' -exec bash -c "echo {}; cat {} | perl checker.pl" \;
+          sudo apt update && sudo apt install p7zip-full nasm make gcc sudo mtools mkisofs parted gdisk gcc-multilib tree -y
 
       - name: Restore toolchain
         id: cache-toolchain
