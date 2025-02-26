@@ -1,0 +1,21 @@
+name: Sync Tags and Releases
+on:
+  schedule:
+    - cron: '0 0 * * *'
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Add upstream remote
+        run: |
+          git remote add upstream https://github.com/KolibriOS/kolibrios.git
+      - name: Fetch upstream tags
+        run: |
+          git fetch upstream --tags
+      - name: Push tags to fork
+        run: |
+          git push origin --tags
