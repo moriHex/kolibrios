@@ -27,14 +27,14 @@ struct collection_int
 :void collection_int::add(dword _in) {
 	unsigned i;
 	if (!buf) {
-		if (buf_size) notify("'buf_size on empty buf' -A");
+		//if (buf_size) notify("'buf_size on empty buf' -A");
 		buf_size = 4096 * 5;
 		buf = malloc(4096 * 5);
-		if (!buf) notify("'malloc error' -E");
+		//if (!buf) notify("'malloc error' -E");
 	} else if (count + 1 * DWSIZE4 >= buf_size) {
 		buf_size += 4096 * 5;
 		buf = realloc(buf, buf_size);
-		if (!buf) notify("'realloc error' -E");
+		//if (!buf) notify("'realloc error' -E");
 	}
 	i = count * DWSIZE4 + buf;
 	ESDWORD[i] = _in;
